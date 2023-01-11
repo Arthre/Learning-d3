@@ -1,18 +1,50 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <div id="container"></div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import axios from 'axios'
+import miserables from '@/assets/miserables.json'
+import { ForceGraph } from './graph/layout/forceGraph'
 
 export default {
-  name: "HomeView",
-  components: {
-    HelloWorld,
+  name: 'HomeView',
+  data() {
+    return {}
   },
-};
+  mounted() {
+    this.init()
+  },
+  methods: {
+    init() {
+      axios
+        .get(`https://mock.apifox.cn/m1/2185386-0-default/list`, { params: { nodes: 1000, links: 1000 } })
+        .then((res) => {
+          const data = res.data.data
+          console.log(data)
+
+          const containerDom = document.getElementById('container')
+          const width = containerDom.offsetWidth,
+            height = containerDom.offsetHeight
+
+          const chart = ForceGraph(miserables, {
+            width,
+            height,
+          })
+          containerDom.append(chart)
+        })
+    },
+  },
+}
 </script>
+
+<style lang="less" scoped>
+#container {
+  width: 1500px;
+  height: 800px;
+  margin: 0 auto;
+  border: 1px solid var(--primaryColor);
+}
+</style>
