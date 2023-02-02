@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/">Canvas</router-link> |
+      <router-link to="/canvas-interaction">Canvas-Interaction</router-link> |
+      <router-link to="/svg">SVG</router-link>
     </nav>
     <router-view />
   </div>

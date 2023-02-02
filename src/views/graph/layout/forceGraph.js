@@ -7,9 +7,7 @@ const color = (d) => scale(d.group)
 // Released under the ISC license.
 // https://observablehq.com/@d3/force-directed-graph-canvas
 export function ForceGraph(data, { width, height = 600 }) {
-  const w2 = width / 2,
-    h2 = height / 2,
-    nodeRadius = 5
+  const nodeRadius = 5
 
   const ctx = context2d(width, height)
   const canvas = ctx.canvas

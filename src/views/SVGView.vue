@@ -7,10 +7,10 @@
 <script>
 import axios from 'axios'
 import miserables from '@/assets/miserables.json'
-import { ForceGraph } from './graph/layout/forceGraph'
+import { ForceGraph } from './graph/layout/forceGraphSVG'
 
 export default {
-  name: 'HomeView',
+  name: 'SVGView',
   data() {
     return {}
   },
@@ -20,7 +20,7 @@ export default {
   methods: {
     init() {
       axios
-        .get(`https://mock.apifox.cn/m1/2185386-0-default/list`, { params: { nodes: 1000, links: 1000 } })
+        .get(`https://mock.apifox.cn/m1/2185386-0-default/list-svg`, { params: { nodes: 5000, links: 5000 } })
         .then((res) => {
           const data = res.data.data
           console.log(data)
@@ -29,7 +29,11 @@ export default {
           const width = containerDom.offsetWidth,
             height = containerDom.offsetHeight
 
-          const chart = ForceGraph(miserables, {
+          const chart = ForceGraph(data, {
+            nodeId: (d) => d.id,
+            nodeGroup: (d) => d.group,
+            nodeTitle: (d) => `${d.id}\n${d.group}`,
+            linkStrokeWidth: (l) => Math.sqrt(l.value),
             width,
             height,
           })
