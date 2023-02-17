@@ -1,13 +1,18 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/CanvasView.vue'
+import CytoscapeView from '../views/CytoscapeView.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
+    component: CytoscapeView,
+  },
+  {
+    path: '/canvas',
+    name: 'canvas',
     component: HomeView,
   },
   {
@@ -25,6 +30,22 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/SVGView.vue'),
+  },
+  {
+    path: '/vis',
+    name: 'vis',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/VisView.vue'),
+  },
+  {
+    path: '/cytoscape',
+    name: 'cytoscape',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: CytoscapeView,
   },
 ]
 

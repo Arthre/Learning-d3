@@ -20,7 +20,7 @@ export default {
   methods: {
     init() {
       axios
-        .get(`https://mock.apifox.cn/m1/2185386-0-default/list-svg`, { params: { nodes: 5000, links: 5000 } })
+        .get(`https://mock.apifox.cn/m1/2185386-0-default/list-svg`, { params: { nodes: 1000, links: 1000 } })
         .then((res) => {
           const data = res.data.data
           console.log(data)
