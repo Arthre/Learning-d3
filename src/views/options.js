@@ -24,3 +24,35 @@ export const panZoomOptions = {
   zoomOutIcon: 'iconfont icon-minus',
   resetIcon: 'iconfont icon-expand',
 }
+
+// 布局配置：https://github.com/iVis-at-Bilkent/cytoscape.js-fcose
+export const fcoseLayout = {
+  name: 'fcose',
+  idealEdgeLength: (edge) => 100,
+  tilingPaddingVertical: 20,
+  tilingPaddingHorizontal: 20,
+}
+
+// 布局配置：https://github.com/shichuanpo/cytoscape.js-d3-force
+export const d3Force = {
+  name: 'd3-force',
+  animate: false,
+  fit: false,
+  linkId: function id(d) {
+    return d.id
+  },
+  linkDistance: 100,
+  manyBodyStrength: -600,
+  ready: function () {
+    document.getElementById('progress-box').style.display = 'block'
+  },
+  stop: function () {
+    document.getElementById('progress-box').style.display = 'none'
+  },
+  tick: function (progress) {
+    let text = (progress * 100).toFixed(1) + '%'
+    document.getElementById('progress-text').innerHTML = `正在计算布局，请稍后 ${text}`
+  },
+  randomize: false,
+  infinite: false,
+}

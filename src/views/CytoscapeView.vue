@@ -28,8 +28,8 @@ import fcose from 'cytoscape-fcose'
 import cola from 'cytoscape-cola'
 import cosmos from 'cosmos-over-cytoscape'
 import d3Force from 'cytoscape-d3-force'
-import { panZoomOptions } from './options.js'
-import { getSVG } from '@/utils/utils.js'
+import styleConfig from './styleConfig'
+import { panZoomOptions, fcoseLayout } from './options.js'
 
 panzoom(cytoscape)
 cytoscape.use(fcose)
@@ -62,69 +62,7 @@ export default {
         this.cy = cytoscape({
           container: document.getElementById('cy-container'),
           elements: { nodes, edges },
-          style: [
-            {
-              selector: 'node',
-              style: {
-                label: 'data(label)',
-                'background-color': '#666',
-                'background-image': (e) => getSVG({ svgName: e.attr('svgName'), svgColor: e.attr('svgColor') }),
-              },
-            },
-            {
-              selector: 'edge',
-              style: {
-                width: 3,
-                'line-color': '#ccc',
-                'target-arrow-color': '#ccc',
-                'target-arrow-shape': 'triangle',
-                'curve-style': 'haystack',
-              },
-            },
-            {
-              selector: 'label',
-              style: {
-                'min-zoomed-font-size': 12,
-              },
-            },
-            {
-              selector: ':selected',
-              style: {
-                'background-color': 'SteelBlue',
-                'line-color': 'black',
-                'target-arrow-color': 'black',
-                'source-arrow-color': 'black',
-              },
-            },
-            {
-              selector: '.active',
-              style: {
-                'background-color': 'deeppink',
-                'line-color': 'skyblue',
-                'target-arrow-color': 'skyblue',
-                'source-arrow-color': 'skyblue',
-              },
-            },
-            {
-              selector: 'node.highlight',
-              style: {
-                'border-color': '#FFF',
-                'border-width': '2px',
-              },
-            },
-            {
-              selector: 'node.semitransp',
-              style: { opacity: '0.5' },
-            },
-            {
-              selector: 'edge.highlight',
-              style: { 'mid-target-arrow-color': '#FFF' },
-            },
-            {
-              selector: 'edge.semitransp',
-              style: { opacity: '0.2' },
-            },
-          ],
+          style: styleConfig,
           minZoom: 0.01,
           maxZoom: 100,
           wheelSensitivity: 0.1,
@@ -133,35 +71,16 @@ export default {
           pixelRatio: 1,
         })
         // 设置布局
-        this.layout = this.cy
-          .layout({
-            name: 'fcose',
-            // name: 'd3-force',
-            // animate: false,
-            // fit: false,
-            // linkId: function id(d) {
-            //   return d.id
-            // },
-            // linkDistance: 100,
-            // manyBodyStrength: -600,
-            // ready: function () {
-            //   document.getElementById('progress-box').style.display = 'block'
-            // },
-            // stop: function () {
-            //   document.getElementById('progress-box').style.display = 'none'
-            // },
-            // tick: function (progress) {
-            //   let text = (progress * 100).toFixed(1) + '%'
-            //   document.getElementById('progress-text').innerHTML = `正在计算布局，请稍后 ${text}`
-            // },
-            // randomize: false,
-            // infinite: false,
-          })
-          .run()
+        this.layout = this.cy.layout(fcoseLayout).run()
         this.cy.panzoom(panZoomOptions)
         console.time('layout')
 
-        this.cy.on('layoutstop', this.handleLayoutStop)
+        this.cy.on(
+          'layoutstop',
+          (this.handleLayoutStop = () => {
+            console.timeEnd('layout')
+          })
+        )
         this.highlightingNeighbor()
       })
     },
@@ -173,7 +92,7 @@ export default {
         this.elementCount.edges += edges.length
         nodes.forEach((v) => this.cy.add(v))
         edges.forEach((v) => this.cy.add(v))
-        this.cy.layout({ name: 'fcose' }).run()
+        this.cy.layout(fcoseLayout).run()
       })
     },
     toggleStyle() {
@@ -187,37 +106,35 @@ export default {
       })
     },
     highlightingNeighbor() {
-      let previous_node
-      let previous_sel
-      this.cy.on('click', 'node', (e) => {
-        var sel = e.target
-        var id = e.target.id()
-
-        this.cy.batch(() => {
-          if (id != previous_node && previous_node != undefined && previous_sel != undefined) {
-            this.cy.elements().removeClass('semitransp')
-            previous_sel.removeClass('highlight').outgoers().union(previous_sel.incomers()).removeClass('highlight')
-          }
-          this.cy.elements().difference(sel.outgoers().union(sel.incomers())).not(sel).addClass('semitransp')
-          sel.addClass('highlight').outgoers().union(sel.incomers()).addClass('highlight')
-
-          previous_sel = sel
-          previous_node = id
-        })
+      const { cy } = this
+      this.cy.on('click', (e) => {
+        if (e.target !== cy && e.target.isNode()) {
+          const allEles = cy.elements()
+          const nNode = e.target.closedNeighborhood()
+          const others = allEles.not(nNode)
+          cy.batch(() => {
+            allEles.removeClass('faded highlight')
+            nNode.addClass('highlight')
+            others.addClass('faded')
+          })
+        } else {
+          cy.batch(() => {
+            cy.elements().removeClass('faded highlight')
+          })
+        }
       })
 
-      // this.cy.on('tapunselect', () => {
-      //   if (previous_node != undefined) {
-      //     const sel = this.cy.$id(previous_node)
-      //     this.cy.batch(() => {
-      //       this.cy.elements().removeClass('semitransp')
-      //       sel.removeClass('highlight').outgoers().union(sel.incomers()).removeClass('highlight')
-      //     })
-      //   }
-      // })
-    },
-    handleLayoutStop(e) {
-      console.timeEnd('layout')
+      // bind tapstart to edges and highlight the connected nodes
+      this.cy.bind('tapstart', 'edge', function (event) {
+        const connected = event.target.connectedNodes()
+        connected.addClass('highlight')
+      })
+
+      // bind tapend to edges and remove the highlight from the connected nodes
+      this.cy.bind('tapend', 'edge', function (event) {
+        const connected = event.target.connectedNodes()
+        connected.removeClass('highlight')
+      })
     },
   },
 }
