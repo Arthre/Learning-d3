@@ -1,0 +1,84 @@
+[
+  {
+    "type": "input",
+    "field": "F0sc1nhphvmz6h",
+    "title": "输入框",
+    "info": "",
+    "_fc_drag_tag": "input",
+    "hidden": false,
+    "display": true
+  },
+  {
+    "type": "checkbox",
+    "field": "Fnf31nhphvrz4c",
+    "title": "多选框",
+    "info": "",
+    "effect": {
+      "fetch": ""
+    },
+    "options": [
+      {
+        "value": "1",
+        "label": "选项1"
+      },
+      {
+        "value": "2",
+        "label": "选项2"
+      }
+    ],
+    "_fc_drag_tag": "checkbox",
+    "hidden": false,
+    "display": true
+  },
+  {
+    "type": "switch",
+    "field": "Fuwb1nhphvtvn3",
+    "title": "开关",
+    "info": "",
+    "_fc_drag_tag": "switch",
+    "hidden": false,
+    "display": true
+  },
+  {
+    "type": "radio",
+    "field": "Fdq21nhphvz5ue",
+    "title": "单选框",
+    "info": "",
+    "effect": {
+      "fetch": ""
+    },
+    "options": [
+      {
+        "value": "1",
+        "label": "选项1"
+      },
+      {
+        "value": "2",
+        "label": "选项2"
+      }
+    ],
+    "_fc_drag_tag": "radio",
+    "hidden": false,
+    "display": true
+  },
+  {
+    "type": "rate",
+    "field": "Fx1d1nhphw2eih",
+    "title": "评分",
+    "info": "",
+    "_fc_drag_tag": "rate",
+    "hidden": false,
+    "display": true,
+    "value": 0
+  },
+  {
+    "type": "slider",
+    "field": "F8zk1nhphw74f8",
+    "title": "滑块",
+    "info": "",
+    "_fc_drag_tag": "slider",
+    "hidden": false,
+    "display": true,
+    "value": 0
+  }
+]

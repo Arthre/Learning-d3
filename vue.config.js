@@ -8,6 +8,8 @@ function resolve(dir) {
 module.exports = defineConfig({
   transpileDependencies: true,
   chainWebpack: (config) => {
+    config.resolve.alias.set('@', resolve('src'))
+
     // svg配置
     config.module.rule('svg').exclude.add(resolve('src/icons')).end()
     config.module
@@ -18,7 +20,7 @@ module.exports = defineConfig({
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
       .options({
-        symbolId: 'icon-[folder]-[name].[ext]',
+        symbolId: 'icon-[name].[ext]',
       })
       .end()
   },

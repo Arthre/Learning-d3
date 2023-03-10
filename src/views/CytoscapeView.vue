@@ -7,11 +7,22 @@
       <div>
         <label>edges:</label> <span>{{ elementCount.edges }}</span>
       </div>
+
+      <div id="drag-container">
+        <div class="drag-box">
+          <svg-icon icon-name="car.svg" />
+        </div>
+        <div class="drag-box">
+          <svg-icon icon-name="address.svg" />
+        </div>
+      </div>
     </div>
-    <div id="cy-container">
+    <div class="cy-wrapper">
+      <div id="cy-container"></div>
       <div id="progress-box">
         <div id="progress-text"></div>
       </div>
+      <!-- <div id="aerial-view"></div> -->
     </div>
     <div class="right-container">
       <button class="block-btn" @click="addDataToGraph">添加数据</button>
@@ -22,16 +33,21 @@
 
 <script>
 import axios from 'axios'
+import dragula from 'dragula'
 import cytoscape from 'cytoscape'
 import panzoom from 'cytoscape-panzoom'
+import navigator from 'cytoscape-navigator'
 import fcose from 'cytoscape-fcose'
 import cola from 'cytoscape-cola'
 import cosmos from 'cosmos-over-cytoscape'
 import d3Force from 'cytoscape-d3-force'
 import styleConfig from './styleConfig'
-import { panZoomOptions, fcoseLayout } from './options.js'
+import { panZoomOptions, navigatorOptions, fcoseLayout } from './options.js'
+import debounce from 'lodash/debounce'
 
+cytoscape.warnings(process.env.NODE_ENV === 'development')
 panzoom(cytoscape)
+// navigator(cytoscape)
 cytoscape.use(fcose)
 cytoscape.use(cola)
 cytoscape.use(cosmos)
@@ -52,6 +68,19 @@ export default {
   },
   mounted() {
     this.init()
+
+    const cyContainer = document.getElementById('cy-container')
+    this.dragula = dragula({ copy: true, mirrorContainer: cyContainer })
+    this.dragula.containers.push(document.getElementById('drag-container'))
+    const mousemoveFn = debounce(this.handlerAddDragNode, 30)
+    this.dragula.on('drag', () => {
+      this.cy.on('mouseup', mousemoveFn)
+    })
+    this.dragula.on('dragend', () => {
+      setTimeout(() => {
+        this.cy.off('mouseup', mousemoveFn)
+      }, 0)
+    })
   },
   methods: {
     init() {
@@ -72,8 +101,13 @@ export default {
         })
         // 设置布局
         this.layout = this.cy.layout(fcoseLayout).run()
+        // 初始化 panzoom UI 控件
         this.cy.panzoom(panZoomOptions)
+        // 初始化 鸟瞰图 控件
+        // this.cy.navigator(navigatorOptions)
         console.time('layout')
+
+        // this.cy.on('mousemove', debounce(this.handlerAddDragNode, 30))
 
         this.cy.on(
           'layoutstop',
@@ -107,22 +141,25 @@ export default {
     },
     highlightingNeighbor() {
       const { cy } = this
-      this.cy.on('click', (e) => {
-        if (e.target !== cy && e.target.isNode()) {
-          const allEles = cy.elements()
-          const nNode = e.target.closedNeighborhood()
-          const others = allEles.not(nNode)
-          cy.batch(() => {
-            allEles.removeClass('faded highlight')
-            nNode.addClass('highlight')
-            others.addClass('faded')
-          })
-        } else {
-          cy.batch(() => {
-            cy.elements().removeClass('faded highlight')
-          })
-        }
-      })
+      this.cy.on(
+        'click',
+        (this.handleNodeClick = (e) => {
+          if (e.target !== cy && e.target.isNode()) {
+            const allEles = cy.elements()
+            const nNode = e.target.closedNeighborhood()
+            const others = allEles.not(nNode)
+            cy.batch(() => {
+              allEles.removeClass('faded highlight')
+              nNode.addClass('highlight')
+              others.addClass('faded')
+            })
+          } else {
+            cy.batch(() => {
+              cy.elements().removeClass('faded highlight')
+            })
+          }
+        })
+      )
 
       // bind tapstart to edges and highlight the connected nodes
       this.cy.bind('tapstart', 'edge', function (event) {
@@ -135,6 +172,9 @@ export default {
         const connected = event.target.connectedNodes()
         connected.removeClass('highlight')
       })
+    },
+    handlerAddDragNode(e) {
+      console.log('handlerAddDragNode', e)
     },
   },
 }
@@ -153,13 +193,24 @@ export default {
   left: 50%;
   z-index: 10;
 }
+#aerial-view {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  border: 1px solid skyblue;
+  background-color: #f9f9f9;
+}
 .container {
   display: flex;
   .left-container {
     width: 10%;
     text-align: center;
   }
-  #cy-container {
+  .cy-wrapper {
+    position: relative;
     width: 80%;
     margin: 0 10px;
   }
@@ -168,6 +219,16 @@ export default {
   }
 }
 
+.drag-box {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 60px;
+  height: 60px;
+  border: 1px solid skyblue;
+  border-radius: 10px;
+  color: deeppink;
+}
 .block-btn {
   display: block;
   + .block-btn {

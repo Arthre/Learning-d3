@@ -1,0 +1,75 @@
+{
+  "form": {
+    "title": "表格标题",
+    "columns": 7
+  },
+  "fields": [
+    {
+      "name": "field1",
+      "label": "字段1",
+      "span": 3,
+      "type": "input",
+      "attr": {
+        "value": ""
+      }
+    },
+    {
+      "name": "field2",
+      "label": "字段2",
+      "type": "select",
+      "span": 1,
+      "options": [
+        { "value": "option1", "label": "选项1" },
+        { "value": "option2", "label": "选项2" },
+        { "value": "option3", "label": "选项3" }
+      ]
+    },
+    {
+      "name": "field3",
+      "label": "字段3",
+      "type": "datepicker",
+      "span": 2
+    },
+    {
+      "name": "field4",
+      "label": "字段3",
+      "type": "datepicker",
+      "span": 1
+    },
+    {
+      "name": "field5",
+      "label": "字段3",
+      "type": "datepicker",
+      "span": 2
+    },
+    {
+      "name": "field6",
+      "label": "字段3",
+      "type": "datepicker",
+      "span": 1
+    },
+    {
+      "name": "field7",
+      "label": "字段4",
+      "span": 2,
+      "type": "textarea"
+    },
+    {
+      "name": "field8",
+      "label": "字段4",
+      "span": 3,
+      "type": "textarea"
+    }
+  ],
+  "rules": {
+    "field1": [
+      {
+        "required": true,
+        "max": 100,
+        "min": 1,
+        "message": "请输入字段1",
+        "trigger": "change"
+      }
+    ]
+  }
+}

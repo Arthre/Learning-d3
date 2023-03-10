@@ -1,4 +1,4 @@
-import { getSVG } from '@/utils/utils.js'
+import { memoizeGetSVG } from '@/utils/utils.js'
 
 export const styleConfig = [
   {
@@ -6,7 +6,7 @@ export const styleConfig = [
     style: {
       label: 'data(label)',
       'background-color': '#666',
-      'background-image': (e) => getSVG({ svgName: e.attr('svgName'), svgColor: e.attr('svgColor') }),
+      'background-image': (e) => memoizeGetSVG({ svgName: e.attr('svgName'), svgColor: e.attr('svgColor') }),
     },
   },
   {
