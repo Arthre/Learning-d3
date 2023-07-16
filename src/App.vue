@@ -5,7 +5,8 @@
       <!-- <router-link to="/canvas-interaction">Canvas-Interaction</router-link> | -->
       <router-link to="/svg">d3-SVG</router-link> | <router-link to="/vis">Vis</router-link> |
       <router-link to="/cytoscape">Cytoscape</router-link> |
-      <router-link to="/formCreate">FormCreate</router-link>
+      <!-- <router-link to="/formCreate">FormCreate</router-link> -->
+      <router-link to="/family">family-graph</router-link>
     </nav>
     <router-view />
   </div>
